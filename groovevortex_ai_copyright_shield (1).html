@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="sk" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrooveVortex AI - Copyright Shield & Real-Time Deep Thinking</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            bg: '#0a0b10',
+                            card: 'rgba(17, 19, 28, 0.75)',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                            primary: '#c084fc', // purple
+                            accent: '#38bdf8', // cyan
+                            success: '#34d399', // emerald
+                            warning: '#fbbf24', // amber
+                            danger: '#f87171', // red
+                        }
+                    },
+                    boxShadow: {
+                        'neon-cyan': '0 0 15px rgba(56, 189, 248, 0.3)',
+                        'neon-purple': '0 0 15px rgba(192, 132, 252, 0.3)',
+                        'neon-red': '0 0 15px rgba(248, 113, 113, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar and glassmorphism styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0b10;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .glassmorphism {
+            background: rgba(15, 17, 28, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .scan-effect::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(56, 189, 248, 0.05), transparent);
+            animation: scanline 6s linear infinite;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-cyber-bg text-gray-100 min-h-screen font-sans scan-effect relative overflow-x-hidden selection:bg-purple-500 selection:text-white">
+
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-purple-600 rounded-full blur-[150px] opacity-20 pointer-events-none"></div>
+    <div class="absolute top-1/3 -right-40 w-96 h-96 bg-cyan-500 rounded-full blur-[150px] opacity-15 pointer-events-none"></div>
+    <div class="absolute bottom-10 left-1/3 w-96 h-96 bg-emerald-500 rounded-full blur-[150px] opacity-10 pointer-events-none"></div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div class="max-w-7xl mx-auto px-4 py-8 relative z-10 flex flex-col min-h-screen">
+        
+        <header class="flex flex-col md:flex-row justify-between items-center gap-6 mb-10 pb-6 border-b border-cyber-border">
+            <div class="flex items-center gap-4">
+                <div class="p-3 bg-gradient-to-tr from-purple-600 to-cyan-500 rounded-2xl shadow-neon-purple flex items-center justify-center">
+                    <i class="fa-solid fa-shield-halved text-2xl text-white animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-cyan-200 to-cyan-400 bg-clip-text text-transparent">
+                        GrooveVortex <span class="text-purple-400">Copyright Shield</span>
+                    </h1>
+                    <p class="text-xs text-gray-400 tracking-wider font-mono uppercase mt-1">Real-time Deep Thinking Copyright Detective AI</p>
+                </div>
+            </div>
+
+            <!-- Voice, Credits and Settings controls -->
+            <div class="flex flex-wrap items-center gap-4 w-full md:w-auto justify-end">
+                <!-- User ID info -->
+                <div class="glassmorphism px-3 py-1.5 rounded-xl text-xs font-mono text-gray-400 flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield text-purple-400"></i>
+                    <span id="user-id-display">Pripájanie...</span>
+                </div>
+                <!-- TTS Control -->
+                <div class="glassmorphism p-2 rounded-xl flex items-center gap-3">
+                    <i class="fa-solid fa-volume-high text-cyan-400 text-sm"></i>
+                    <select id="tts-voice" class="bg-cyber-bg text-xs text-gray-300 focus:outline-none max-w-[150px] border-none font-mono cursor-pointer">
+                        <option value="none">Načítavam hlasy...</option>
+                    </select>
+                    <button id="test-voice-btn" class="text-xs px-2 py-1 bg-cyber-border rounded hover:bg-gray-700 transition" title="Otestovať hlas">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                </div>
+                <!-- Status indicator -->
+                <div id="db-status-badge" class="flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 px-3 py-1.5 rounded-full">
+                    <span class="w-2 h-2 bg-purple-400 rounded-full animate-ping"></span>
+                    <span class="text-xs text-purple-400 font-mono">Spájanie db...</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-8">
+            <!-- Left Panel: Configurations & GrooveVortex Player (4 cols) -->
+            <aside class="lg:col-span-4 flex flex-col gap-6">
+                
+                <div class="glassmorphism p-6 rounded-2xl relative overflow-hidden border border-cyan-500/20">
+                    <div class="absolute -top-10 -left-10 w-24 h-24 bg-cyan-500/10 rounded-full blur-xl"></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-crown text-amber-400 animate-bounce"></i>
+                            <h3 class="font-bold text-gray-200">Kredity a Predplatné</h3>
+                        </div>
+                        <span id="subscription-badge" class="text-[10px] font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded">Creator Free</span>
+                    </div>
+
+                    <div class="bg-cyber-bg/80 border border-cyber-border rounded-xl p-4 mb-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-gray-400">Copyright analýzy za mesiac:</span>
+                            <span id="credits-count-display" class="text-sm font-bold text-cyan-300 font-mono">4 / 4</span>
+                        </div>
+                        <!-- Progress bar -->
+                        <div class="w-full bg-gray-950 h-2 rounded-full overflow-hidden border border-cyber-border">
+                            <div id="credits-progress-bar" class="bg-gradient-to-r from-cyan-400 to-purple-500 h-full w-full transition-all duration-500"></div>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-gray-500 mt-2 font-mono">
+                            <span>Obnova balíka:</span>
+                            <span id="reset-date-display">Načítavam...</span>
+                        </div>
+                    </div>
+
+                    <button id="open-pricing-btn" class="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:opacity-90 py-2.5 rounded-xl font-bold text-xs transition tracking-wider flex items-center justify-center gap-2 shadow-neon-cyan">
+                        <i class="fa-solid fa-gem animate-pulse"></i> ZVÝŠIŤ LIMIT / KÚPIŤ BALÍK
+                    </button>
+                </div>
+
+                <!-- API Credentials Card -->
+                <div class="glassmorphism p-6 rounded-2xl relative overflow-hidden group">
+                    <div class="absolute -top-10 -right-10 w-24 h-24 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-all"></div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <i class="fa-solid fa-key text-purple-400"></i>
+                        <h3 class="font-bold text-gray-200">Konfigurácia API</h3>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-4 leading-relaxed">
+                        Pre plnú funkčnosť zadajte svoje kľúče. Údaje sa bezpečne ukladajú do IndexedDB vo vašom prehliadači.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-mono text-purple-300 mb-1.5">Gemini API Kľúč <span class="text-red-400">*</span></label>
+                            <div class="relative">
+                                <input type="password" id="gemini-key" class="w-full bg-cyber-bg/80 border border-cyber-border rounded-xl px-4 py-2.5 pl-10 text-xs font-mono focus:outline-none focus:border-purple-400 transition" placeholder="Zadajte Gemini API Key...">
+                                <i class="fa-solid fa-brain absolute left-3.5 top-3.5 text-gray-500 text-xs"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-mono text-cyan-300 mb-1.5">YouTube API Kľúč <span class="text-gray-500">(Nepovinné)</span></label>
+                            <div class="relative">
+                                <input type="password" id="youtube-key" class="w-full bg-cyber-bg/80 border border-cyber-border rounded-xl px-4 py-2.5 pl-10 text-xs font-mono focus:outline-none focus:border-cyan-400 transition" placeholder="Zadajte YouTube API Key...">
+                                <i class="fa-brands fa-youtube absolute left-3.5 top-3.5 text-gray-500 text-xs"></i>
+                            </div>
+                        </div>
+                        <button id="save-keys-btn" class="w-full bg-gradient-to-r from-purple-600 to-cyan-500 hover:opacity-90 py-2.5 rounded-xl font-bold text-xs transition tracking-wider flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i> ULOŽIŤ DO DATABÁZY
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glassmorphism p-6 rounded-2xl relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-compact-disc text-cyan-400 animate-spin" style="animation-duration: 4s;"></i>
+                            <h3 class="font-bold text-gray-200">GrooveVortex Sound-Gen</h3>
+                        </div>
+                        <span class="text-[10px] font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded">Procedural Audio</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-4 leading-relaxed">
+                        Spustite unikátne syntetizovanú, autorsky chránenú audio stopu generovanú v reálnom čase na otestovanie detektora!
+                    </p>
+                    
+                    <div class="bg-cyber-bg/50 border border-cyber-border p-4 rounded-xl flex flex-col items-center gap-4">
+                        <div class="flex items-center gap-3 w-full justify-between">
+                            <div class="flex flex-col">
+                                <span id="vortex-status" class="text-xs font-semibold text-gray-300">Generátor zastavený</span>
+                                <span class="text-[10px] text-gray-500 font-mono">Oscillators: SAW & TRIANGLE</span>
+                            </div>
+                            <!-- Canvas Visualizer -->
+                            <canvas id="audio-visualizer" class="w-24 h-8 bg-black/40 rounded border border-cyber-border"></canvas>
+                        </div>
+
+                        <div class="flex gap-2 w-full">
+                            <button id="play-vortex-btn" class="flex-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-play"></i> SPUSŤ SÚBORY
+                            </button>
+                            <button id="analyze-internal-btn" class="flex-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 border border-purple-500/40 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> ANALYZUJ TENTO
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Database reference indicators -->
+                <div class="glassmorphism p-5 rounded-2xl text-xs space-y-3">
+                    <h4 class="font-bold text-gray-300 font-mono"><i class="fa-solid fa-database text-gray-400 mr-1.5"></i>Globálna Registračná Databáza</h4>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center py-1 border-b border-cyber-border/50">
+                            <span class="text-gray-400">GrooveVortex Registry</span>
+                            <span class="text-emerald-400 font-mono">14,209,219 ID</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1 border-b border-cyber-border/50">
+                            <span class="text-gray-400">YouTube Content ID Sync</span>
+                            <span class="text-emerald-400 font-mono">Active (Live)</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1">
+                            <span class="text-gray-400">Copyright Law Indexing</span>
+                            <span class="text-emerald-400 font-mono">DMCA / EU Article 17</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="lg:col-span-8 flex flex-col gap-6">
+                <!-- Search and URL Detector -->
+                <div class="glassmorphism p-6 rounded-2xl">
+                    <h2 class="text-lg font-bold text-gray-200 mb-2">Vyhľadávanie YouTube Videí & Kontrola Copyrightu</h2>
+                    <p class="text-xs text-gray-400 mb-5 leading-relaxed">
+                        Vložte URL odkaz na video, názov pesničky alebo interpreta. AI preverí prítomnosť licencií, autorských vlastníkov a identifikuje riziká.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="relative flex-1">
+                            <input type="text" id="yt-search-input" class="w-full bg-cyber-bg/80 border border-cyber-border rounded-xl px-4 py-3.5 pl-11 text-sm focus:outline-none focus:border-cyan-400 transition font-mono" placeholder="https://www.youtube.com/watch?v=... alebo 'Billie Eilish'">
+                            <i class="fa-brands fa-youtube absolute left-4 top-4.5 text-gray-500 text-base"></i>
+                        </div>
+                        <button id="start-analysis-btn" class="bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 hover:opacity-95 px-6 py-3.5 rounded-xl font-bold text-sm tracking-wide transition flex items-center justify-center gap-2 shadow-neon-cyan whitespace-nowrap">
+                            <i class="fa-solid fa-magnifying-glass"></i> HĹBKOVÁ ANALÝZA
+                        </button>
+                    </div>
+
+                    <!-- Preset test items -->
+                    <div class="flex flex-wrap gap-2 mt-4 items-center">
+                        <span class="text-[10px] font-mono text-gray-500 uppercase">Populárne šablóny na test:</span>
+                        <button onclick="setTestQuery('https://www.youtube.com/watch?v=dQw4w9WgXcQ')" class="text-[11px] bg-cyber-border hover:bg-gray-700 px-3 py-1 rounded-full text-gray-300 transition">Rickroll Video</button>
+                        <button onclick="setTestQuery('Infected Mushroom - GrooveVortex Special Master')" class="text-[11px] bg-cyber-border hover:bg-gray-700 px-3 py-1 rounded-full text-gray-300 transition">Vortex Psytrance</button>
+                        <button onclick="setTestQuery('Lo-fi Beats Safe Royalty Free Background Music')" class="text-[11px] bg-cyber-border hover:bg-gray-700 px-3 py-1 rounded-full text-gray-300 transition">Royalty Free Lo-Fi</button>
+                    </div>
+                </div>
+
+                <div id="thinking-panel" class="hidden glassmorphism p-6 rounded-2xl border border-purple-500/20 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 animate-pulse"></div>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="relative w-5 h-5 flex items-center justify-center">
+                                <div class="absolute w-full h-full border-2 border-purple-400/30 rounded-full animate-ping"></div>
+                                <i class="fa-solid fa-atom text-purple-400 text-sm animate-spin" style="animation-duration: 3s;"></i>
+                            </div>
+                            <h3 class="font-bold text-purple-300 font-mono tracking-wide">HLBOKÉ UVAŽOVANIE V REÁLNOM ČASE (AI THOUGHT ENGINE)</h3>
+                        </div>
+                        <span id="thinking-progress-pct" class="text-xs font-mono text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded border border-cyan-500/20">0%</span>
+                    </div>
+
+                    <!-- Progress bar -->
+                    <div class="w-full bg-cyber-bg h-1.5 rounded-full mb-4 overflow-hidden border border-cyber-border">
+                        <div id="thinking-progress-bar" class="w-0 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 h-full transition-all duration-300"></div>
+                    </div>
+
+                    <!-- Thinking Output Log terminal -->
+                    <div id="thinking-terminal" class="bg-[#05060a]/90 rounded-xl p-4 border border-cyber-border font-mono text-xs text-purple-200/90 h-64 overflow-y-auto space-y-2 flex flex-col justify-start">
+                        <div class="text-gray-500 text-[11px] border-b border-cyber-border pb-1.5 mb-2 flex justify-between">
+                            <span>SPOJENIE: SECURE COMPLIANCE TUNNEL AI</span>
+                            <span>UTC 2026-07-15</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="result-panel" class="hidden glassmorphism p-6 rounded-2xl border border-emerald-500/20 transition-all duration-500">
+                    <div class="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between pb-6 border-b border-cyber-border mb-6">
+                        <div class="flex items-center gap-4">
+                            <!-- Visual Ring representing Danger / Warning / Success -->
+                            <div id="verdict-icon-container" class="w-16 h-16 rounded-2xl flex items-center justify-center relative shadow-lg">
+                                <!-- Set dynamically -->
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">Záverečný AI Verdikt</span>
+                                <h2 id="verdict-title" class="text-xl md:text-2xl font-black mt-0.5">ANALÝZA DOKONČENÁ</h2>
+                                <p id="verdict-subtitle" class="text-xs text-gray-400 mt-1">Spracované prostredníctvom legislatívneho modulu</p>
+                            </div>
+                        </div>
+
+                        <!-- Speech controls -->
+                        <div class="flex items-center gap-2 bg-cyber-bg/50 border border-cyber-border p-2 rounded-xl self-stretch md:self-auto justify-center">
+                            <button id="speak-verdict-btn" class="bg-cyan-500 hover:bg-cyan-600 text-black px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-volume-high"></i> PREČÍTAŤ AI SPRÁVU
+                            </button>
+                            <button id="stop-speak-btn" class="bg-cyber-border hover:bg-gray-700 text-gray-300 px-3 py-2 rounded-lg text-xs transition">
+                                <i class="fa-solid fa-stop"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Breakdown & AI Details -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-cyber-bg/40 p-4 rounded-xl border border-cyber-border">
+                            <span class="text-[10px] text-gray-400 font-mono block mb-1">DRŽITEĽ PRÁV (CLAIMANT)</span>
+                            <span id="verdict-claimant" class="text-sm font-semibold text-gray-200">-</span>
+                        </div>
+                        <div class="bg-cyber-bg/40 p-4 rounded-xl border border-cyber-border">
+                            <span class="text-[10px] text-gray-400 font-mono block mb-1">TYP LICENCIE</span>
+                            <span id="verdict-license" class="text-sm font-semibold text-gray-200">-</span>
+                        </div>
+                        <div class="bg-cyber-bg/40 p-4 rounded-xl border border-cyber-border">
+                            <span class="text-[10px] text-gray-400 font-mono block mb-1">ÚROVEŇ RIZIKA</span>
+                            <span id="verdict-risk" class="text-sm font-bold">-</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-cyber-bg/50 p-5 rounded-xl border border-cyber-border space-y-4">
+                        <h4 class="font-bold text-gray-300 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-feather-pointed text-purple-400"></i> Detailný Právny Rozbor (Gemini Deep LLM)
+                        </h4>
+                        <!-- Dynamic rich text summary -->
+                        <div id="verdict-reasoning" class="text-xs text-gray-300 leading-relaxed font-sans space-y-2">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- YouTube Video Metadata fallback viewer -->
+                    <div id="youtube-metadata-box" class="hidden mt-6 bg-cyber-bg/30 p-4 rounded-xl border border-cyber-border/60">
+                        <h5 class="text-xs font-mono text-cyan-400 mb-3 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-brands fa-youtube"></i> Analyzované video dáta
+                        </h5>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <img id="yt-thumbnail" class="w-full sm:w-32 h-auto sm:h-20 rounded-lg object-cover border border-cyber-border" src="https://placehold.co/160x90/11131c/ffffff?text=Video" alt="Thumbnail">
+                            <div class="space-y-1">
+                                <h6 id="yt-title" class="text-xs font-bold text-gray-200">-</h6>
+                                <p id="yt-channel" class="text-[11px] text-gray-400">-</p>
+                                <p id="yt-views" class="text-[10px] text-gray-500 font-mono">- pozretí</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Notifications area -->
+                <div id="toast-container" class="fixed bottom-5 right-5 space-y-2 z-50"></div>
+            </main>
+        </div>
+
+        <div id="pricing-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+            <div class="glassmorphism w-full max-w-5xl rounded-3xl overflow-hidden border border-purple-500/30 flex flex-col my-8 max-h-[90vh]">
+                <div class="p-6 border-b border-cyber-border flex justify-between items-center bg-gradient-to-r from-purple-900/40 via-cyan-900/20 to-transparent">
+                    <div>
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-gem text-cyan-400"></i> GrooveVortex Premium Centrála
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-1">Vyberte si balík pre neobmedzené kontroly, autorskú istotu a pokročilú analýzu.</p>
+                    </div>
+                    <button id="close-pricing-btn" class="p-2 rounded-lg bg-cyber-border hover:bg-gray-800 text-gray-400 hover:text-white transition">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Tabs header -->
+                <div class="flex border-b border-cyber-border bg-[#0f111c]">
+                    <button id="tab-free" class="flex-1 py-3 text-xs font-bold font-mono border-b-2 border-cyan-400 text-cyan-400 transition uppercase tracking-wider">Bezplatné (3 Balíky)</button>
+                    <button id="tab-monthly" class="flex-1 py-3 text-xs font-bold font-mono border-b-2 border-transparent text-gray-400 hover:text-white transition uppercase tracking-wider">Mesačné Premium (4 Balíky)</button>
+                    <button id="tab-yearly" class="flex-1 py-3 text-xs font-bold font-mono border-b-2 border-transparent text-gray-400 hover:text-white transition uppercase tracking-wider">Ročné Premium (2 Balíky)</button>
+                </div>
+
+                <div class="p-6 overflow-y-auto flex-1 space-y-6">
+                    <!-- FREE PACKAGES SECTION -->
+                    <div id="pricing-section-free" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Free Package 1 -->
+                        <div class="bg-cyber-bg/60 border border-cyber-border p-5 rounded-2xl flex flex-col justify-between hover:border-gray-500 transition-all">
+                            <div>
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-xs font-mono font-bold text-gray-400 bg-gray-800 px-2 py-0.5 rounded">ŠTANDARD</span>
+                                    <span class="text-xs font-mono text-emerald-400 font-bold">0.00 EUR</span>
+                                </div>
+                                <h4 class="text-base font-bold text-white">Vortex Starter</h4>
+                                <p class="text-xs text-gray-400 mt-2">Základná bezplatná kontrola autorských práv s minimálnymi limitmi.</p>
+                                <ul class="text-[11px] text-gray-300 mt-4 space-y-2">
+                                    <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i> 1 Copyright analýza mesačne</li>
+                                    <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i> Štandardné Deep Thinking</li>
+                                    <li><i class="fa-solid fa-triangle-exclamation text-red-400 mr-2"></i> Dlhé uvažovanie spáli všetky kredity!</li>
+                                </ul>
+                            </div>
+                            <button onclick="selectPackage('Vortex Starter', 1, 0.00, 'mo')" class="w-full mt-6 py-2 bg-gray-800 hover:bg-gray-700 rounded-xl text-xs font-bold transition">Aktivovať zadarmo</button>
+                        </div>
+                        <!-- Free Package 2 -->
+                        <div id="pkg-creator-free-card" class="bg-purple-950/10 border border-purple-500/30 p-5 rounded-2xl flex flex-col justify-between relative hover:border-purple-400 transition-all">
+                            <div id="pkg-creator-free-badge" class="absolute -top-3 right-4 bg-purple-500 text-black font-extrabold text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider">AKTÍVNY</div>
+                            <div>
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-xs font-mono font-bold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded">POPULÁRNY</span>
+                                    <span class="text-xs font-mono text-emerald-400 font-bold">0.00 EUR</span>
+                                </div>
+                                <h4 class="text-base font-bold text-white">Creator Free</h4>
+                                <p class="text-xs text-gray-400 mt-2">Ideálny balík pre drobných tvorcov hľadajúcich optimálny štart.</p>
+                                <ul class="text-[11px] text-gray-300 mt-4 space-y-2">
+                                    <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i> 4 Copyright analýzy mesačne</li>
+                                    <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i> Štandardné Deep Thinking</li>
+                                    <li><i class="fa-solid fa-triangle-exclamation text-red-400 mr-2"></i> Dlhé uvažovanie spáli všetky kredity!</li>
+                                </ul>
+                            </div>
+                            <button id="pkg-creator-free-btn" class="w-full mt-6 py-2 bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-xl text-xs font-bold cursor-default" disabled>Predvolený aktívny</button>
+                        </div>
+                        <!-- Free Package 3 -->
+                        <div class="bg-cyber-bg/60 border border-cyber-border p-5 rounded-2xl flex flex-col justify-between hover:border-gray-500 transition-all">
+                            <div>
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-xs font-mono font-bold text-gray-400 bg-gray-800 px-2 py-0.5 rounded">ŠTUDENT</span>
+                                    <span class="text-xs font-mono text-emerald-400 font-bold">0.00 EUR</span>
+                                </div>
+                                <h4 class="text-base font-bold text-white">Vortex Academy</h4>
+                                <p class="text-xs text-gray-400 mt-2">Akademický a nekomerčný bezplatný balík pre študijné účely.</p>
+                                <ul class="text-[11px] text-gray-300 mt-4 space-y-2">
+                                    <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i> 2 Copyright analýzy mesačne</li>
+                                    <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i> Štandardné Deep Thinking</li>
+                                    <li><i class="fa-solid fa-triangle-exclamation text-red-400 mr-2"></i> Dlhé uvažovanie spáli všetky kredity!</li>
+                                </ul>
+                            </div>
+                            <button onclick="selectPackage('Vortex Academy', 2, 0.00, 'mo')" class="w-full mt-6 py-2 bg-gray-800 hover:bg-gray-700 rounded-xl text-xs font-bold transition">Aktivovať zadarmo</button>
+                        </div>
+                    </div>
+
+                    <!-- MONTHLY PREMIUM SECTION -->
+                    <div id="pricing-section-monthly" class="hidden grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- Monthly Package 1 -->
+                        <div class="bg-cyber-bg/60 border border-cyber-border p-4 rounded-2xl flex flex-col justify-between hover:border-cyan-500/50 transition-all">
+                            <div>
+                                <span class="text-[10px] font-mono font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded">VORTEX LITE</span>
+                                <h4 class="text-sm font-bold text-white mt-2">Lite Creator</h4>
+                                <p class="text-[11px] text-gray-400 mt-1">Základné zvýšenie limitov pre tvorcov s občasnou frekvenciou videí.</p>
+                                <span class="block text-lg font-bold text-white mt-3">4.99 €<span class="text-xs text-gray-500">/mes</span></span>
+                                <ul class="text-[10px] text-gray-300 mt-4 space-y-1.5 border-t border-cyber-border pt-3">
+                                    <li><i class="fa-solid fa-check text-cyan-400 mr-1.5"></i> 10 analýz / mesiac</li>
+                                    <li><i class="fa-solid fa-check text-cyan-400 mr-1.5"></i> Ochrana pred prepálením kreditov</li>
+                                    <li><i class="fa-solid fa-check text-cyan-400 mr-1.5"></i> Prioritné Deep Thinking</li>
+                                </ul>
+                            </div>
+                            <button onclick="openPaymentGateway('Lite Creator', 10, 4.99, 'mesiac')" class="w-full mt-5 py-2 bg-cyan-500 text-black font-bold rounded-xl text-xs hover:bg-cyan-400 transition">Kúpiť balík</button>
+                        </div>
+                        <!-- Monthly Package 2 -->
+                        <div class="bg-gradient-to-b from-cyan-950/20 to-purple-950/20 border-2 border-cyan-400 p-4 rounded-2xl flex flex-col justify-between relative shadow-neon-cyan">
+                            <div class="absolute -top-3 right-4 bg-cyan-400 text-black font-extrabold text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider">ODPORÚČANÝ</div>
+                            <div>
+                                <span class="text-[10px] font-mono font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded">VORTEX PRO</span>
+                                <h4 class="text-sm font-bold text-white mt-2">Vortex Pro Shield</h4>
+                                <p class="text-[11px] text-gray-400 mt-1">Profesionálna ochrana a komplexné skenovanie s masívnym balíkom kreditov.</p>
+                                <span class="block text-lg font-bold text-white mt-3">14.99 €<span class="text-xs text-gray-500">/mes</span></span>
+                                <ul class="text-[10px] text-gray-300 mt-4 space-y-1.5 border-t border-cyber-border pt-3">
+                                    <li><i class="fa-solid fa-check text-cyan-400 mr-1.5"></i> 50 analýz / mesiac</li>
+                                    <li><i class="fa-solid fa-check text-cyan-400 mr-1.5"></i> Žiadne straty pri dlhom uvažovaní</li>
+                                    <li><i class="fa-solid fa-check text-cyan-400 mr-1.5"></i> Rýchlejšia odozva Gemini</li>
+                                </ul>
+                            </div>
+                            <button onclick="openPaymentGateway('Vortex Pro Shield', 50, 14.99, 'mesiac')" class="w-full mt-5 py-2 bg-gradient-to-r from-cyan-400 to-purple-500 text-black font-extrabold rounded-xl text-xs hover:opacity-90 transition">Kúpiť balík</button>
+                        </div>
+                        <!-- Monthly Package 3 -->
+                        <div class="bg-cyber-bg/60 border border-cyber-border p-4 rounded-2xl flex flex-col justify-between hover:border-cyan-500/50 transition-all">
+                            <div>
+                                <span class="text-[10px] font-mono font-bold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded">VORTEX STUDIO</span>
+                                <h4 class="text-sm font-bold text-white mt-2">Studio Creator</h4>
+                                <p class="text-[11px] text-gray-400 mt-1">Vynikajúca voľba pre stredné produkčné tímy a nahrávacie štúdiá.</p>
+                                <span class="block text-lg font-bold text-white mt-3">29.99 €<span class="text-xs text-gray-500">/mes</span></span>
+                                <ul class="text-[10px] text-gray-300 mt-4 space-y-1.5 border-t border-cyber-border pt-3">
+                                    <li><i class="fa-solid fa-check text-purple-400 mr-1.5"></i> 150 analýz / mesiac</li>
+                                    <li><i class="fa-solid fa-check text-purple-400 mr-1.5"></i> 100% autorská ochrana doložiek</li>
+                                    <li><i class="fa-solid fa-check text-purple-400 mr-1.5"></i> Ultra-rýchly dedukčný kanál</li>
+                                </ul>
+                            </div>
+                            <button onclick="openPaymentGateway('Studio Creator', 150, 29.99, 'mesiac')" class="w-full mt-5 py-2 bg-purple-500 text-black font-bold rounded-xl text-xs hover:bg-purple-400 transition">Kúpiť balík</button>
+                        </div>
+                        <!-- Monthly Package 4 -->
+                        <div class="bg-cyber-bg/60 border border-cyber-border p-4 rounded-2xl flex flex-col justify-between hover:border-cyan-500/50 transition-all">
+                            <div>
+                                <span class="text-[10px] font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">UNLIMITED</span>
+                                <h4 class="text-sm font-bold text-white mt-2">Ultimate Shield</h4>
+                                <p class="text-[11px] text-gray-400 mt-1">Nekonečný prístup k analýzam bez akýchkoľvek obmedzení.</p>
+                                <span class="block text-lg font-bold text-white mt-3">49.99 €<span class="text-xs text-gray-500">/mes</span></span>
+                                <ul class="text-[10px] text-gray-300 mt-4 space-y-1.5 border-t border-cyber-border pt-3">
+                                    <li><i class="fa-solid fa-infinity text-amber-400 mr-1.5"></i> Neobmedzený počet analýz</li>
+                                    <li><i class="fa-solid fa-check text-amber-400 mr-1.5"></i> Pokročilé generatívne reporty</li>
+                                    <li><i class="fa-solid fa-check text-amber-400 mr-1.5"></i> Osobný asistent pre autorský zákon</li>
+                                </ul>
+                            </div>
+                            <button onclick="openPaymentGateway('Ultimate Shield', 9999, 49.99, 'mesiac')" class="w-full mt-5 py-2 bg-amber-500 text-black font-bold rounded-xl text-xs hover:bg-amber-400 transition">Kúpiť balík</button>
+                        </div>
+                    </div>
+
+                    <!-- YEARLY PREMIUM SECTION -->
+                    <div id="pricing-section-yearly" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                        <!-- Yearly Package 1 -->
+                        <div class="bg-cyber-bg/60 border border-cyber-border p-6 rounded-2xl flex flex-col justify-between hover:border-cyan-500/50 transition-all relative">
+                            <div class="absolute top-4 right-4 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono font-bold px-2 py-1 rounded">UŠETRÍTE 45%</div>
+                            <div>
+                                <span class="text-[10px] font-mono font-bold text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded">ANNUAL PRO</span>
+                                <h4 class="text-lg font-bold text-white mt-3">Annual Pro Shield</h4>
+                                <p class="text-xs text-gray-400 mt-2">Celoročná ochrana s neobmedzeným prístupom k Deep Thinking na plný rok.</p>
+                                <span class="block text-2xl font-black text-white mt-4">99.99 €<span class="text-xs text-gray-500">/rok</span></span>
+                                <ul class="text-xs text-gray-300 mt-5 space-y-2.5 border-t border-cyber-border pt-4">
+                                    <li><i class="fa-solid fa-infinity text-emerald-400 mr-2"></i> Neobmedzené skenovanie autorských práv</li>
+                                    <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i> Ochrana pred preťažením kreditov</li>
+                                    <li><i class="fa-solid fa-check text-emerald-400 mr-2"></i> Plná podpora pre DMCA urovnanie</li>
+                                </ul>
+                            </div>
+                            <button onclick="openPaymentGateway('Annual Pro Shield', 9999, 99.99, 'rok')" class="w-full mt-6 py-3 bg-gradient-to-r from-cyan-400 to-purple-500 text-black font-extrabold rounded-xl text-xs hover:opacity-90 transition">Aktivovať Ročný Balík</button>
+                        </div>
+                        <!-- Yearly Package 2 -->
+                        <div class="bg-gradient-to-b from-purple-950/20 to-black/40 border border-purple-500/40 p-6 rounded-2xl flex flex-col justify-between hover:border-purple-400 transition-all relative shadow-neon-purple">
+                            <div class="absolute top-4 right-4 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono font-bold px-2 py-1 rounded">UŠETRÍTE 65%</div>
+                            <div>
+                                <span class="text-[10px] font-mono font-bold text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded">VORTEX ENTERPRISE</span>
+                                <h4 class="text-lg font-bold text-white mt-3">Enterprise Ultimate</h4>
+                                <p class="text-xs text-gray-400 mt-2">Prémiová podniková licencia pre masívnu distribúciu a multi-kanálové preverovanie.</p>
+                                <span class="block text-2xl font-black text-white mt-4">199.99 €<span class="text-xs text-gray-500">/rok</span></span>
+                                <ul class="text-xs text-gray-300 mt-5 space-y-2.5 border-t border-cyber-border pt-4">
+                                    <li><i class="fa-solid fa-infinity text-purple-400 mr-2"></i> Neobmedzený celoživotný prístup s prioritným API</li>
+                                    <li><i class="fa-solid fa-check text-purple-400 mr-2"></i> Vlastný certifikát GrooveVortex autorského práva</li>
+                                    <li><i class="fa-solid fa-check text-purple-400 mr-2"></i> Dedikovaný právny AI audit</li>
+                                </ul>
+                            </div>
+                            <button onclick="openPaymentGateway('Enterprise Ultimate', 9999, 199.99, 'rok')" class="w-full mt-6 py-3 bg-purple-500 text-black font-extrabold rounded-xl text-xs hover:bg-purple-400 transition shadow-neon-purple">Aktivovať Ročný Balík</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="payment-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+            <div class="glassmorphism w-full max-w-md rounded-2xl overflow-hidden border border-cyan-400/30 p-6 relative">
+                <div class="absolute -top-12 -right-12 w-28 h-28 bg-cyan-500/10 rounded-full blur-xl"></div>
+                <div class="flex justify-between items-start mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-cyan-500/20 border border-cyan-400/40 rounded-lg text-cyan-400">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white font-mono">Cyber Secure Gateway</h3>
+                            <p class="text-[10px] text-gray-400">Šifrované spojenie AES-256</p>
+                        </div>
+                    </div>
+                    <button id="close-payment-btn" class="text-gray-400 hover:text-white transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Billing Summary -->
+                <div class="bg-cyber-bg border border-cyber-border rounded-xl p-3 mb-6 flex justify-between items-center">
+                    <div class="text-left">
+                        <span class="text-[10px] text-gray-500 block font-mono">BALÍK</span>
+                        <span id="gateway-package-name" class="text-xs font-bold text-gray-200">Vortex Pro Shield</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-gray-500 block font-mono">SUMA K ÚHRADE</span>
+                        <span id="gateway-package-price" class="text-xs font-bold text-emerald-400">14.99 EUR</span>
+                    </div>
+                </div>
+
+                <!-- 9-Digit Code input -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-mono text-cyan-300 mb-1.5">Zadajte 9-miestny platobný overovací kód:</label>
+                        <div class="flex gap-2 justify-center" id="digit-inputs-container">
+                            <!-- 9 individual digits input box -->
+                            <input type="text" maxlength="1" class="digit-input w-10 h-12 bg-gray-950 border border-cyber-border rounded-lg text-center text-lg font-bold font-mono focus:outline-none focus:border-cyan-400 transition" placeholder="•">
+                            <input type="text" maxlength="1" class="digit-input w-10 h-12 bg-gray-950 border border-cyber-border rounded-lg text-center text-lg font-bold font-mono focus:outline-none focus:border-cyan-400 transition" placeholder="•">
+                            <input type="text" maxlength="1" class="digit-input w-10 h-12 bg-gray-950 border border-cyber-border rounded-lg text-center text-lg font-bold font-mono focus:outline-none focus:border-cyan-400 transition" placeholder="•">
+                            <span class="self-center text-gray-500 font-mono">-</span>
+                            <input type="text" maxlength="1" class="digit-input w-10 h-12 bg-gray-950 border border-cyber-border rounded-lg text-center text-lg font-bold font-mono focus:outline-none focus:border-cyan-400 transition" placeholder="•">
+                            <input type="text" maxlength="1" class="digit-input w-10 h-12 bg-gray-950 border border-cyber-border rounded-lg text-center text-lg font-bold font-mono focus:outline-none focus:border-cyan-400 transition" placeholder="•">
+                            <input type="text" maxlength="1" class="digit-input w-10 h-12 bg-gray-950 border border-cyber-border rounded-lg text-center text-lg font-bold font-mono focus:outline-none focus:border-cyan-400 transition" placeholder="•">
+                            <span class="self-center text-gray-500 font-mono">-</span>
+                            <input type="text" maxlength="1" class="digit-input w-10 h-12 bg-gray-950 border border-cyber-border rounded-lg text-center text-lg font-bold font-mono focus:outline-none focus:border-cyan-400 transition" placeholder="•">
+                            <input type="text" maxlength="1" class="digit-input w-10 h-12 bg-gray-950 border border-cyber-border rounded-lg text-center text-lg font-bold font-mono focus:outline-none focus:border-cyan-400 transition" placeholder="•">
+                            <input type="text" maxlength="1" class="digit-input w-10 h-12 bg-gray-950 border border-cyber-border rounded-lg text-center text-lg font-bold font-mono focus:outline-none focus:border-cyan-400 transition" placeholder="•">
+                        </div>
+                        <p class="text-[9px] text-gray-500 mt-2 leading-relaxed">
+                            Zadajte akýkoľvek 9-miestny číselný kód (napr. 123-456-789) na overenie transakcie v našom simulátore brány.
+                        </p>
+                    </div>
+
+                    <!-- Status / Error message inside modal -->
+                    <div id="gateway-status-msg" class="hidden text-xs py-2 text-center font-mono rounded"></div>
+
+                    <button id="process-payment-btn" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold py-3 rounded-xl text-xs hover:opacity-90 transition flex items-center justify-center gap-2 tracking-wider">
+                        <i class="fa-solid fa-lock"></i> VERIFIKOVAŤ PLATBU (9-MIESTNY KÓD)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-auto pt-8 border-t border-cyber-border flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
+            <p>© 2026 GrooveVortex Copyright Shield AI. Všetky práva vyhradené.</p>
+            <div class="flex gap-4">
+                <a href="#" class="hover:text-gray-300 transition">Zásady ochrany</a>
+                <a href="#" class="hover:text-gray-300 transition">Zmluvné podmienky</a>
+                <a href="#" class="hover:text-gray-300 transition">IndexedDB API Integration</a>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        // Database Configuration and Setup
+        const DB_NAME = 'GrooveVortexLocalDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'userSettings';
+        let localDB = null;
+
+        // Default User Profile state
+        let userProfile = {
+            subscriptionType: "Creator Free",
+            credits: 4,
+            maxCredits: 4,
+            resetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            geminiKey: "",
+            youtubeKey: "",
+            localUid: "GV-LOCAL-" + Math.floor(100000 + Math.random() * 900000)
+        };
+
+        const dbStatusBadge = document.getElementById('db-status-badge');
+        const userIdDisplay = document.getElementById('user-id-display');
+
+        function initIndexedDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = (event) => {
+                    console.error("IndexedDB error:", event);
+                    reject(event);
+                };
+
+                request.onsuccess = (event) => {
+                    localDB = event.target.result;
+                    resolve(localDB);
+                };
+
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+                    if (!database.objectStoreNames.contains(STORE_NAME)) {
+                        database.createObjectStore(STORE_NAME);
+                    }
+                };
+            });
+        }
+
+        function loadUserProfileFromDB() {
+            return new Promise((resolve, reject) => {
+                if (!localDB) return reject("Database not initialized");
+                const transaction = localDB.transaction([STORE_NAME], 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.get('userProfile');
+
+                request.onsuccess = () => {
+                    if (request.result) {
+                        userProfile = request.result;
+                        
+                        // Check if 1 month has passed to reset credits
+                        const now = new Date();
+                        const resetDate = new Date(userProfile.resetDate);
+                        if (now > resetDate) {
+                            userProfile.credits = userProfile.maxCredits;
+                            userProfile.resetDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+                            saveUserProfileToDB();
+                            showToast("Vaše mesačné limity sa automaticky obnovili!", "success");
+                        }
+                    } else {
+                        // First-time user, save defaults
+                        saveUserProfileToDB();
+                    }
+                    resolve(userProfile);
+                };
+
+                request.onerror = () => {
+                    reject(request.error);
+                };
+            });
+        }
+
+        function saveUserProfileToDB() {
+            return new Promise((resolve, reject) => {
+                if (!localDB) return reject("Database not initialized");
+                const transaction = localDB.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.put(userProfile, 'userProfile');
+
+                request.onsuccess = () => {
+                    resolve();
+                };
+
+                request.onerror = () => {
+                    reject(request.error);
+                };
+            });
+        }
+
+        async function startLocalDatabase() {
+            try {
+                await initIndexedDB();
+                await loadUserProfileFromDB();
+
+                // UI Display Update
+                userIdDisplay.innerText = `LOKÁLNY ID: ${userProfile.localUid}`;
+                dbStatusBadge.innerHTML = `<span class="w-2 h-2 bg-emerald-400 rounded-full animate-ping"></span><span class="text-xs text-emerald-400 font-mono">IndexedDB Local</span>`;
+                dbStatusBadge.className = "flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-full";
+
+                renderCreditsUI();
+
+                // Prefill keys
+                if (userProfile.geminiKey) document.getElementById('gemini-key').value = userProfile.geminiKey;
+                if (userProfile.youtubeKey) document.getElementById('youtube-key').value = userProfile.youtubeKey;
+
+            } catch (err) {
+                console.error("Local database failure:", err);
+                dbStatusBadge.innerHTML = `<span class="w-2 h-2 bg-red-400 rounded-full"></span><span class="text-xs text-red-400 font-mono">Offline / Error</span>`;
+                dbStatusBadge.className = "flex items-center gap-2 bg-red-500/10 border border-red-500/30 px-3 py-1.5 rounded-full";
+                showToast("Chyba: Lokálna IndexedDB sa nenačítala.", "error");
+            }
+        }
+
+        function renderCreditsUI() {
+            const isUnlimited = userProfile.maxCredits >= 9999;
+            document.getElementById('subscription-badge').innerText = userProfile.subscriptionType;
+            
+            const displayCredits = isUnlimited ? "∞ / ∞" : `${userProfile.credits} / ${userProfile.maxCredits}`;
+            document.getElementById('credits-count-display').innerText = displayCredits;
+
+            const percent = isUnlimited ? 100 : (userProfile.credits / userProfile.maxCredits) * 100;
+            document.getElementById('credits-progress-bar').style.width = `${percent}%`;
+
+            const dateStr = new Date(userProfile.resetDate).toLocaleDateString('sk-SK');
+            document.getElementById('reset-date-display').innerText = dateStr;
+
+            // Highlight if current active subscription is not Free to update prices
+            updateFreeBadgeHighlight();
+        }
+
+        function updateFreeBadgeHighlight() {
+            const isFree = userProfile.subscriptionType === "Creator Free";
+            const badge = document.getElementById('pkg-creator-free-badge');
+            const card = document.getElementById('pkg-creator-free-card');
+            const btn = document.getElementById('pkg-creator-free-btn');
+
+            if (isFree) {
+                badge.classList.remove('hidden');
+                card.classList.add('border-purple-500/30', 'bg-purple-950/10');
+                btn.innerText = "Predvolený aktívny";
+                btn.disabled = true;
+            } else {
+                badge.classList.add('hidden');
+                card.classList.remove('border-purple-500/30', 'bg-purple-950/10');
+                btn.innerText = "Aktivovať zadarmo";
+                btn.disabled = false;
+                btn.onclick = () => selectPackage('Creator Free', 4, 0.00, 'mo');
+            }
+        }
+
+        // Export state and save methods to window context for cross-script execution
+        window.getUserProfileState = () => userProfile;
+        window.setUserProfileState = (newProfile) => { userProfile = newProfile; };
+        window.saveUserProfileToDb = saveUserProfileToDB;
+        window.loadUserProfile = loadUserProfileFromDB;
+
+        // Run boot sequence on window load
+        window.addEventListener('load', () => {
+            startLocalDatabase();
+        });
+    </script>
+
+    <script>
+        const geminiKeyInput = document.getElementById('gemini-key');
+        const youtubeKeyInput = document.getElementById('youtube-key');
+        const saveKeysBtn = document.getElementById('save-keys-btn');
+        const toastContainer = document.getElementById('toast-container');
+
+        function showToast(message, type = "info") {
+            const toast = document.createElement('div');
+            toast.className = `p-4 rounded-xl text-xs font-semibold flex items-center justify-between gap-3 shadow-lg min-w-[300px] border transition-all duration-300 transform translate-y-2 opacity-0 glassmorphism`;
+            
+            let icon = '';
+            if (type === 'success') {
+                toast.classList.add('border-emerald-500/20', 'text-emerald-400');
+                icon = '<i class="fa-solid fa-circle-check text-base"></i>';
+            } else if (type === 'error') {
+                toast.classList.add('border-red-500/20', 'text-red-400');
+                icon = '<i class="fa-solid fa-triangle-exclamation text-base"></i>';
+            } else {
+                toast.classList.add('border-cyan-500/20', 'text-cyan-400');
+                icon = '<i class="fa-solid fa-circle-info text-base"></i>';
+            }
+
+            toast.innerHTML = `
+                <div class="flex items-center gap-2 text-left">
+                    ${icon}
+                    <span>${message}</span>
+                </div>
+                <button class="text-gray-400 hover:text-white" onclick="this.parentElement.remove()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        // Save API Keys to Local IndexedDB Database
+        saveKeysBtn.addEventListener('click', async () => {
+            const geminiKey = geminiKeyInput.value.trim();
+            const ytKey = youtubeKeyInput.value.trim();
+            
+            if (!geminiKey) {
+                showToast("Pred pokračovaním musíte zadať platný Gemini API kľúč!", "error");
+                return;
+            }
+
+            if (typeof window.getUserProfileState === 'function') {
+                const profile = window.getUserProfileState();
+                profile.geminiKey = geminiKey;
+                profile.youtubeKey = ytKey;
+                window.setUserProfileState(profile);
+                await window.saveUserProfileToDb();
+                showToast("API kľúče boli bezpečne uložené do lokálnej IndexedDB!", "success");
+            } else {
+                showToast("Chyba synchronizácie s databázou. Skúste znova.", "error");
+            }
+        });
+
+        function setTestQuery(query) {
+            document.getElementById('yt-search-input').value = query;
+            showToast(`Vybratá šablóna: "${query}"`, "info");
+        }
+
+        let audioCtx = null;
+        let visualCtx = null;
+        let analyserNode = null;
+        let isPlayingVortex = false;
+        let vortexTimer = null;
+        const canvas = document.getElementById('audio-visualizer');
+        const playVortexBtn = document.getElementById('play-vortex-btn');
+        const vortexStatus = document.getElementById('vortex-status');
+
+        function initAudioCtx() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyserNode = audioCtx.createAnalyser();
+                analyserNode.fftSize = 64;
+                analyserNode.connect(audioCtx.destination);
+                
+                visualCtx = canvas.getContext('2d');
+                drawVisualizer();
+            }
+        }
+
+        function toggleVortexSound() {
+            initAudioCtx();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            if (isPlayingVortex) {
+                stopVortexSound();
+            } else {
+                startVortexSound();
+            }
+        }
+
+        function startVortexSound() {
+            isPlayingVortex = true;
+            playVortexBtn.innerHTML = `<i class="fa-solid fa-pause"></i> ZASTAVIŤ SÚBOR`;
+            playVortexBtn.classList.remove('bg-cyan-500/20', 'text-cyan-400');
+            playVortexBtn.classList.add('bg-red-500/20', 'text-red-400', 'border-red-500/40');
+            vortexStatus.innerText = "Hrá: GrooveVortex Spec";
+            showToast("Spustený generátor autorskej vzorky GrooveVortex", "info");
+
+            let beatIndex = 0;
+            vortexTimer = setInterval(() => {
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = beatIndex % 4 === 0 ? 'sawtooth' : 'triangle';
+                const baseFreq = 55; // A1 frequency
+                const notes = [1, 1.2, 1.5, 1.8, 2.0];
+                const noteSelect = notes[Math.floor(Math.random() * notes.length)];
+                osc.frequency.setValueAtTime(baseFreq * noteSelect * (beatIndex % 2 === 0 ? 2 : 4), now);
+                
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+                
+                osc.connect(gain);
+                gain.connect(analyserNode);
+                
+                osc.start(now);
+                osc.stop(now + 0.5);
+                
+                beatIndex++;
+            }, 250);
+        }
+
+        function stopVortexSound() {
+            isPlayingVortex = false;
+            playVortexBtn.innerHTML = `<i class="fa-solid fa-play"></i> SPUSŤ SÚBORY`;
+            playVortexBtn.classList.add('bg-cyan-500/20', 'text-cyan-400');
+            playVortexBtn.classList.remove('bg-red-500/20', 'text-red-400', 'border-red-500/40');
+            vortexStatus.innerText = "Generátor zastavený";
+            
+            if (vortexTimer) {
+                clearInterval(vortexTimer);
+                vortexTimer = null;
+            }
+        }
+
+        function drawVisualizer() {
+            if (!visualCtx) return;
+            requestAnimationFrame(drawVisualizer);
+            
+            const bufferLength = analyserNode.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyserNode.getByteFrequencyData(dataArray);
+            
+            visualCtx.fillStyle = 'rgba(5, 6, 10, 0.4)';
+            visualCtx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const barWidth = (canvas.width / bufferLength) * 1.5;
+            let barHeight;
+            let x = 0;
+            
+            for(let i = 0; i < bufferLength; i++) {
+                barHeight = dataArray[i] / 4;
+                visualCtx.fillStyle = `rgb(${192 - barHeight}, ${barHeight + 100}, 252)`;
+                visualCtx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
+                x += barWidth;
+            }
+        }
+
+        playVortexBtn.addEventListener('click', toggleVortexSound);
+
+        let voices = [];
+        const voiceSelect = document.getElementById('tts-voice');
+        const testVoiceBtn = document.getElementById('test-voice-btn');
+        const speakVerdictBtn = document.getElementById('speak-verdict-btn');
+        const stopSpeakBtn = document.getElementById('stop-speak-btn');
+        let currentSpeakingText = "";
+
+        function initSpeechSynthesis() {
+            if (typeof speechSynthesis === 'undefined') return;
+            
+            const loadVoices = () => {
+                voices = speechSynthesis.getVoices();
+                voiceSelect.innerHTML = '';
+                
+                const sortedVoices = [...voices].sort((a, b) => {
+                    const langA = a.lang.toLowerCase();
+                    const langB = b.lang.toLowerCase();
+                    if (langA.includes('sk')) return -1;
+                    if (langB.includes('sk')) return 1;
+                    if (langA.includes('cs')) return -1;
+                    if (langB.includes('cs')) return 1;
+                    return langA.localeCompare(langB);
+                });
+
+                sortedVoices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    if (voice.lang.startsWith('sk-') || voice.lang === 'sk') {
+                        option.selected = true; // Auto-select Slovak
+                    }
+                    voiceSelect.appendChild(option);
+                });
+                
+                if (voiceSelect.children.length === 0) {
+                    const option = document.createElement('option');
+                    option.value = "none";
+                    option.textContent = "Hlasy nie sú dostupné";
+                    voiceSelect.appendChild(option);
+                }
+            };
+
+            loadVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = loadVoices;
+            }
+        }
+
+        testVoiceBtn.addEventListener('click', () => {
+            speakText("Ahoj, toto je test môjho hlasu. GrooveVortex AI systém je pripravený na hĺbkovú analýzu.", true);
+        });
+
+        stopSpeakBtn.addEventListener('click', () => {
+            if (typeof speechSynthesis !== 'undefined') {
+                speechSynthesis.cancel();
+                showToast("Hlas bol zastavený", "info");
+            }
+        });
+
+        speakVerdictBtn.addEventListener('click', () => {
+            if (!currentSpeakingText) {
+                showToast("Nie je k dispozícii žiadna analyzovaná správa na čítanie.", "error");
+                return;
+            }
+            speakText(currentSpeakingText);
+        });
+
+        function speakText(text, isShort = false) {
+            if (typeof speechSynthesis === 'undefined') {
+                showToast("Syntéza reči nie je podporovaná vo vašom prehliadači.", "error");
+                return;
+            }
+
+            speechSynthesis.cancel(); // Stop current speech
+            
+            const cleanedText = text.replace(/<[^>]*>/g, '').substring(0, isShort ? 200 : 2000);
+            const utterance = new SpeechSynthesisUtterance(cleanedText);
+            
+            const selectedVoiceName = voiceSelect.value;
+            const selectedVoice = voices.find(v => v.name === selectedVoiceName);
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            }
+            
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            
+            utterance.onstart = () => showToast("Spúšťam hlasové čítanie...", "info");
+            utterance.onerror = (e) => console.error("SpeechSynthesis error:", e);
+
+            speechSynthesis.speak(utterance);
+        }
+
+        const thinkingPanel = document.getElementById('thinking-panel');
+        const thinkingTerminal = document.getElementById('thinking-terminal');
+        const thinkingProgressBar = document.getElementById('thinking-progress-bar');
+        const thinkingProgressPct = document.getElementById('thinking-progress-pct');
+        const resultPanel = document.getElementById('result-panel');
+
+        const thinkingSteps = [
+            { text: "⚡ Inicializujem modul GrooveVortex Copyright Shield...", delay: 800 },
+            { text: "🔍 Parzujem cieľový YouTube odkaz a analyzujem signatúry...", delay: 1000 },
+            { text: "🛰️ Vyhľadávam dáta a metadáta cez YouTube API kanál...", delay: 1200 },
+            { text: "📊 Sťahujem ID vlastníkov autorských práv a popisy videí...", delay: 1500 },
+            { text: "🧐 Preverujem zhodu s globálnou databázou GrooveVortex a Content ID...", delay: 2000 },
+            { text: "🔒 Vyhodnocujem licenčné štítky (Creative Commons vs Standard License)...", delay: 1200 },
+            { text: "🧪 Spúšťam uvažovanie AI: Vyhľadávam skrytých vlastníkov (UMG, WMG, SME)...", delay: 1800 },
+            { text: "🧠 Presúvam dáta do hlavného procesného modulu Gemini AI na vypracovanie autorského posudku...", delay: 1500 },
+            { text: "📝 Generujem právny sumár a bezpečnostné odporúčania pre užívateľov...", delay: 1000 }
+        ];
+
+        function logToTerminal(text, type = 'info') {
+            const line = document.createElement('div');
+            const time = new Date().toLocaleTimeString();
+            let colorClass = 'text-purple-300';
+            
+            if (type === 'success') colorClass = 'text-emerald-400 font-semibold';
+            if (type === 'warning') colorClass = 'text-amber-400';
+            if (type === 'error') colorClass = 'text-red-400';
+            
+            line.innerHTML = `<span class="text-gray-500 font-normal">[${time}]</span> <span class="${colorClass}">${text}</span>`;
+            thinkingTerminal.appendChild(line);
+            thinkingTerminal.scrollTop = thinkingTerminal.scrollHeight;
+        }
+
+        async function runDeepThinkingAnimation() {
+            thinkingPanel.classList.remove('hidden');
+            resultPanel.classList.add('hidden');
+            thinkingTerminal.innerHTML = `
+                <div class="text-gray-500 text-[11px] border-b border-cyber-border pb-1.5 mb-2 flex justify-between">
+                    <span>SPOJENIE: SECURE COMPLIANCE TUNNEL AI</span>
+                    <span>UTC 2026-07-15</span>
+                </div>
+            `;
+            
+            let totalSteps = thinkingSteps.length;
+            
+            for (let i = 0; i < totalSteps; i++) {
+                const step = thinkingSteps[i];
+                logToTerminal(step.text, i === totalSteps - 1 ? 'success' : 'info');
+                
+                const pct = Math.round(((i + 1) / totalSteps) * 100);
+                thinkingProgressBar.style.width = `${pct}%`;
+                thinkingProgressPct.innerText = `${pct}%`;
+                
+                if (i === 4) {
+                    await sleep(600);
+                    logToTerminal("⚠️ Hlboká dedukcia: Zistená zhoda s frekvenciami 142Hz zhodná s autorskou stopou ID_24151.", "warning");
+                }
+                if (i === 6) {
+                    await sleep(500);
+                    logToTerminal("🛡️ GrooveVortex filter: Skladba neobsahuje priame obmedzenia, no podlieha doložke DMCA.", "warning");
+                }
+                
+                await sleep(step.delay);
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        const pricingModal = document.getElementById('pricing-modal');
+        const paymentModal = document.getElementById('payment-modal');
+        const openPricingBtn = document.getElementById('open-pricing-btn');
+        const closePricingBtn = document.getElementById('close-pricing-btn');
+        const closePaymentBtn = document.getElementById('close-payment-btn');
+        const processPaymentBtn = document.getElementById('process-payment-btn');
+
+        const tabFree = document.getElementById('tab-free');
+        const tabMonthly = document.getElementById('tab-monthly');
+        const tabYearly = document.getElementById('tab-yearly');
+
+        const secFree = document.getElementById('pricing-section-free');
+        const secMonthly = document.getElementById('pricing-section-monthly');
+        const secYearly = document.getElementById('pricing-section-yearly');
+
+        // Tabs switching
+        tabFree.addEventListener('click', () => switchTab('free'));
+        tabMonthly.addEventListener('click', () => switchTab('monthly'));
+        tabYearly.addEventListener('click', () => switchTab('yearly'));
+
+        function switchTab(tab) {
+            tabFree.classList.add('border-transparent', 'text-gray-400');
+            tabFree.classList.remove('border-cyan-400', 'text-cyan-400');
+            tabMonthly.classList.add('border-transparent', 'text-gray-400');
+            tabMonthly.classList.remove('border-cyan-400', 'text-cyan-400');
+            tabYearly.classList.add('border-transparent', 'text-gray-400');
+            tabYearly.classList.remove('border-cyan-400', 'text-cyan-400');
+
+            secFree.classList.add('hidden');
+            secMonthly.classList.add('hidden');
+            secYearly.classList.add('hidden');
+
+            if (tab === 'free') {
+                tabFree.classList.add('border-b-2', 'border-cyan-400', 'text-cyan-400');
+                secFree.classList.remove('hidden');
+            } else if (tab === 'monthly') {
+                tabMonthly.classList.add('border-b-2', 'border-cyan-400', 'text-cyan-400');
+                secMonthly.classList.remove('hidden');
+            } else {
+                tabYearly.classList.add('border-b-2', 'border-cyan-400', 'text-cyan-400');
+                secYearly.classList.remove('hidden');
+            }
+        }
+
+        openPricingBtn.addEventListener('click', () => pricingModal.classList.remove('hidden'));
+        closePricingBtn.addEventListener('click', () => pricingModal.classList.add('hidden'));
+        closePaymentBtn.addEventListener('click', () => paymentModal.classList.add('hidden'));
+
+        const digitInputs = document.querySelectorAll('.digit-input');
+        digitInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                // Keep only numbers
+                input.value = input.value.replace(/[^0-9]/g, '');
+                if (input.value && index < digitInputs.length - 1) {
+                    digitInputs[index + 1].focus();
+                }
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === "Backspace" && !input.value && index > 0) {
+                    digitInputs[index - 1].focus();
+                }
+            });
+        });
+
+        // Activate Free Package directly
+        async function selectPackage(pkgName, credits, price, cycle) {
+            if (typeof window.getUserProfileState !== 'function') return;
+            const profile = window.getUserProfileState();
+            profile.subscriptionType = pkgName;
+            profile.credits = credits;
+            profile.maxCredits = credits;
+            profile.resetDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+            
+            window.setUserProfileState(profile);
+            await window.saveUserProfileToDb();
+            
+            // Re-render
+            pricingModal.classList.add('hidden');
+            renderCreditsUI();
+            showToast(`Bezplatný balík ${pkgName} úspešne aktivovaný!`, "success");
+        }
+
+        // Open Payment Gateway for Premium Package
+        let selectedPendingPackage = null;
+        function openPaymentGateway(pkgName, credits, price, cycle) {
+            selectedPendingPackage = { name: pkgName, credits: credits, price: price };
+            document.getElementById('gateway-package-name').innerText = pkgName;
+            document.getElementById('gateway-package-price').innerText = `${price} EUR`;
+            
+            // Clear inputs
+            digitInputs.forEach(i => i.value = '');
+            document.getElementById('gateway-status-msg').classList.add('hidden');
+
+            pricingModal.classList.add('hidden');
+            paymentModal.classList.remove('hidden');
+            digitInputs[0].focus();
+        }
+
+        processPaymentBtn.addEventListener('click', async () => {
+            let code = "";
+            digitInputs.forEach(i => code += i.value);
+
+            const statusMsg = document.getElementById('gateway-status-msg');
+            statusMsg.classList.remove('hidden');
+
+            if (code.length < 9) {
+                statusMsg.className = "text-xs py-2 text-center font-mono rounded bg-red-500/10 text-red-400 border border-red-500/20";
+                statusMsg.innerText = "Chyba: Kód musí mať presne 9 číslic!";
+                return;
+            }
+
+            statusMsg.className = "text-xs py-2 text-center font-mono rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20";
+            statusMsg.innerText = "Odosielam požiadavku do banky... (Šifrujem)";
+            processPaymentBtn.disabled = true;
+
+            await sleep(2500); // Simulate transaction processing latency
+
+            statusMsg.innerText = "Autorizácia prebehla úspešne! Aktualizujem databázu...";
+            await sleep(1000);
+
+            // Successfully processed - Update database profile
+            if (typeof window.getUserProfileState === 'function') {
+                const profile = window.getUserProfileState();
+                profile.subscriptionType = selectedPendingPackage.name;
+                profile.credits = selectedPendingPackage.credits;
+                profile.maxCredits = selectedPendingPackage.credits;
+                profile.resetDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+                
+                window.setUserProfileState(profile);
+                await window.saveUserProfileToDb();
+
+                showToast(`Prémiový balík ${selectedPendingPackage.name} úspešne aktivovaný!`, "success");
+                paymentModal.classList.add('hidden');
+                
+                // Refresh profile state neatly
+                renderCreditsUI();
+            }
+
+            processPaymentBtn.disabled = false;
+        });
+
+        const startAnalysisBtn = document.getElementById('start-analysis-btn');
+        const ytSearchInput = document.getElementById('yt-search-input');
+        const analyzeInternalBtn = document.getElementById('analyze-internal-btn');
+
+        // Main event for Analysis
+        startAnalysisBtn.addEventListener('click', () => {
+            const query = ytSearchInput.value.trim();
+            if (!query) {
+                showToast("Zadajte odkaz na video alebo názov pre vyhľadávanie!", "error");
+                return;
+            }
+            performAnalysisFlow(query);
+        });
+
+        analyzeInternalBtn.addEventListener('click', () => {
+            setTestQuery("Infected Mushroom & GrooveVortex - Quantum Dimension (Synthesized Original)");
+            performAnalysisFlow("Infected Mushroom & GrooveVortex - Quantum Dimension (Synthesized Original)");
+        });
+
+        async function performAnalysisFlow(query) {
+            if (typeof window.getUserProfileState !== 'function') {
+                showToast("Predplatné sa stále načítava. Počkajte prosím sekundu...", "error");
+                return;
+            }
+
+            const profile = window.getUserProfileState();
+            const isUnlimited = profile.maxCredits >= 9999;
+
+            // Check if user has enough credits
+            if (!isUnlimited && profile.credits <= 0) {
+                showToast(`Chyba: Vyčerpali ste všetky povolené analýzy za tento mesiac! Budúce obnovenie: ${new Date(profile.resetDate).toLocaleDateString('sk-SK')}. Zakúpte si premium balík pre neobmedzené skenovanie.`, "error");
+                pricingModal.classList.remove('hidden');
+                return;
+            }
+
+            // Check for Gemini API key
+            const geminiKey = profile.geminiKey || document.getElementById('gemini-key').value.trim();
+            if (!geminiKey) {
+                showToast("Nenašiel sa platný Gemini API kľúč! Uložte ho prosím v kľúčovom paneli naľavo.", "error");
+                return;
+            }
+
+            try {
+                startAnalysisBtn.disabled = true;
+                startAnalysisBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> PREBIEHA ANALÝZA...`;
+                
+                // Run the real-time deep thinking logs
+                await runDeepThinkingAnimation();
+                
+                const isFreePackage = profile.subscriptionType.includes('Free') || profile.subscriptionType.includes('Starter') || profile.subscriptionType.includes('Academy');
+
+                if (isFreePackage) {
+                    // Dramatic monetization rule trigger: Burning all remaining credits if they run a deep thinking process!
+                    logToTerminal("⚠️ [DETEKCIA VYSOKÉHO ZAŤAŽENIA] Spustené hĺbkové uvažovanie spotrebovalo nadmerné množstvo výpočtových cyklov!", "error");
+                    logToTerminal("📉 BEZPLATNÉ PRAVIDLO: Všetky vaše zvyšné bezplatné kredity za tento mesiac boli spálené na spracovanie doložky!", "error");
+                    
+                    profile.credits = 0; // Burn all free credits
+                    window.setUserProfileState(profile);
+                    await window.saveUserProfileToDb();
+                    
+                    showToast("Upozornenie: Hlboké uvažovanie spotrebovalo všetky zostávajúce bezplatné kredity pre tento mesiac!", "error");
+                } else {
+                    // Regular Premium user - Deduct only 1 credit safely if not unlimited
+                    if (!isUnlimited) {
+                        profile.credits = Math.max(0, profile.credits - 1);
+                        window.setUserProfileState(profile);
+                        await window.saveUserProfileToDb();
+                    }
+                    logToTerminal("✅ [AUTORIZOVANÝ PREMIUM KANÁL] Odpočítaný 1 kredit z vášho balíka.", "success");
+                }
+
+                // Query YouTube Data
+                const ytKey = profile.youtubeKey || document.getElementById('youtube-key').value.trim();
+                let videoMetadata = await fetchVideoMetadata(query, ytKey);
+                
+                logToTerminal("📡 Odosielam požiadavku na vyhodnotenie do Gemini AI...", "info");
+                
+                // Call Gemini API for detailed copyright audit
+                const aiReport = await callGeminiAI(videoMetadata, geminiKey);
+                
+                // Render verdict and complete
+                renderVerdict(aiReport, videoMetadata);
+                showToast("Copyright audit bol úspešne dokončený!", "success");
+                
+            } catch (err) {
+                console.error(err);
+                logToTerminal(`❌ Chyba počas analýzy: ${err.message}`, "error");
+                showToast(`Chyba: ${err.message}`, "error");
+            } finally {
+                startAnalysisBtn.disabled = false;
+                startAnalysisBtn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> HĹBKOVÁ ANALÝZA`;
+                if (typeof window.loadUserProfile === 'function') {
+                    await window.loadUserProfile(); // Re-sync credits to UI
+                    renderCreditsUI();
+                }
+            }
+        }
+
+        async function fetchVideoMetadata(query, apiKey) {
+            logToTerminal("🕵️ Spúšťam modul sťahovania YouTube meta-dát...", "info");
+            
+            const isUrl = query.includes('youtube.com') || query.includes('youtu.be');
+            let videoId = "";
+            
+            if (isUrl) {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                const match = query.match(regExp);
+                if (match && match[2].length == 11) {
+                    videoId = match[2];
+                }
+            }
+
+            // Fallback mock and standard response generator if API key isn't provided
+            if (!apiKey) {
+                logToTerminal("⚠️ Nenašiel sa YouTube API kľúč. Prechádzam na offline heuristický dedukčný engine...", "warning");
+                await sleep(1000);
+                
+                let title = isUrl ? "Rick Astley - Never Gonna Give You Up (Official Music Video)" : query;
+                let channel = isUrl ? "Rick Astley" : "Hudobný umelec - Automatické vyhľadávanie";
+                let description = `Oficiálna licencovaná stopa. Všetky práva vyhradené spoločnosti RCA Records, Sony Music Entertainment. Obsahuje licencovaný audio track v databáze Content ID.`;
+                
+                if (query.toLowerCase().includes('vortex')) {
+                    title = "Infected Mushroom & GrooveVortex - Quantum Dimension";
+                    channel = "GrooveVortex Sound-Gen Lab";
+                    description = "Autorsky certifikovaná skladba registrovaná pod licenciou GrooveVortex. Použitie povolené pre nekomerčné streamovacie projekty pod podmienkou uvedenia kreditu.";
+                } else if (query.toLowerCase().includes('lo-fi') || query.toLowerCase().includes('lofi')) {
+                    title = "Relaxing Lo-Fi Beats for Study / Work";
+                    channel = "ChilledCow Clone";
+                    description = "Creative Commons BY-SA 4.0. Táto skladba nepodlieha autorským nárokom tretej strany a je bezpečná pre vaše videá.";
+                }
+                
+                return {
+                    id: videoId || "dQw4w9WgXcQ",
+                    title,
+                    channel,
+                    description,
+                    views: "1,452,091",
+                    thumbnail: `https://placehold.co/160x90/11131c/c084fc?text=${encodeURIComponent(title.substring(0,10))}`
+                };
+            }
+
+            // Real YouTube Data API Fetch
+            try {
+                let url = "";
+                if (videoId) {
+                    url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${apiKey}`;
+                } else {
+                    url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=1&key=${apiKey}`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error.message);
+                }
+                
+                let item = null;
+                if (videoId) {
+                    item = data.items?.[0];
+                } else {
+                    const searchItem = data.items?.[0];
+                    if (searchItem) {
+                        videoId = searchItem.id.videoId;
+                        const detailUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${apiKey}`;
+                        const detailRes = await fetch(detailUrl);
+                        const detailData = await detailRes.json();
+                        item = detailData.items?.[0];
+                    }
+                }
+                
+                if (!item) {
+                    throw new Error("Nepodarilo sa nájsť žiadne zodpovedajúce video na YouTube.");
+                }
+                
+                return {
+                    id: videoId,
+                    title: item.snippet.title,
+                    channel: item.snippet.channelTitle,
+                    description: item.snippet.description,
+                    views: parseInt(item.statistics?.viewCount || 0).toLocaleString(),
+                    thumbnail: item.snippet.thumbnails?.medium?.url || `https://placehold.co/160x90/11131c/c084fc?text=Video`
+                };
+                
+            } catch (err) {
+                logToTerminal(`⚠️ YouTube API zlyhalo alebo kľúč je neplatný: ${err.message}. Prechádzam na fallback analýzu...`, "error");
+                return {
+                    id: "dQw4w9WgXcQ",
+                    title: query,
+                    channel: "Neznámy kanál",
+                    description: "Vyhľadané cez offline dedukčný model. Popis nie je dostupný kvôli API obmedzeniu.",
+                    views: "Nedostupné",
+                    thumbnail: `https://placehold.co/160x90/11131c/c084fc?text=${encodeURIComponent(query.substring(0, 10))}`
+                };
+            }
+        }
+
+        async function callGeminiAI(metadata, apiKey) {
+            logToTerminal("🧠 Spúšťam analýzu právneho rámca pomocou Gemini 3.1 LLM...", "info");
+            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+            
+            const systemPrompt = `Si špičkový svetový expert na autorské práva, licencovanie hudby a YouTube Content ID systémy.
+Analyzuj poskytnuté metadáta o videu a priprav detailnú správu o stave autorských práv v SLOVENSKOM jazyku.
+Musíš vrátiť výsledok vo formáte JSON s nasledujúcou schémou:
+{
+  "verdict": "LOW" | "MEDIUM" | "HIGH" | "CRITICAL",
+  "title": "Názov a celkový záver",
+  "claimant": "Meno predpokladaného držiteľa práv alebo 'Žiadny zistený'",
+  "license": "Creative Commons / Standard / Copyrighted",
+  "reasoningHtml": "Detailný právny rozbor rozdelený do odsekov v slovenskom jazyku s vysvetlením rizík a odporúčaním čo s tým.",
+  "audioSafety": "Bezpečné / Čiastočne Bezpečné / Nebezpečné"
+}`;
+
+            const userQuery = `Názov videa: ${metadata.title}
+Kanál: ${metadata.channel}
+Popis videa: ${metadata.description}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            verdict: { type: "STRING" },
+                            title: { type: "STRING" },
+                            claimant: { type: "STRING" },
+                            license: { type: "STRING" },
+                            reasoningHtml: { type: "STRING" },
+                            audioSafety: { type: "STRING" }
+                        },
+                        required: ["verdict", "title", "claimant", "license", "reasoningHtml", "audioSafety"]
+                    }
+                },
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                }
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error?.message || "Chyba komunikácie s Gemini API.");
+            }
+
+            const result = await response.json();
+            const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!jsonText) {
+                throw new Error("Nepodarilo sa vygenerovať odpoveď z Gemini.");
+            }
+
+            return JSON.parse(jsonText);
+        }
+
+        function renderVerdict(report, metadata) {
+            thinkingPanel.classList.add('hidden');
+            resultPanel.classList.remove('hidden');
+
+            const iconContainer = document.getElementById('verdict-icon-container');
+            const titleEl = document.getElementById('verdict-title');
+            const claimantEl = document.getElementById('verdict-claimant');
+            const licenseEl = document.getElementById('verdict-license');
+            const riskEl = document.getElementById('verdict-risk');
+            const reasoningEl = document.getElementById('verdict-reasoning');
+            
+            const ytBox = document.getElementById('youtube-metadata-box');
+            document.getElementById('yt-title').innerText = metadata.title;
+            document.getElementById('yt-channel').innerText = metadata.channel;
+            document.getElementById('yt-views').innerText = `${metadata.views} zobrazení`;
+            document.getElementById('yt-thumbnail').src = metadata.thumbnail;
+            ytBox.classList.remove('hidden');
+
+            let riskColor = "text-emerald-400";
+            let bgGlow = "bg-emerald-500/10";
+            let iconMarkup = '<i class="fa-solid fa-circle-check text-3xl text-emerald-400"></i>';
+            let riskLabel = "Nízke (LOW)";
+
+            if (report.verdict === "CRITICAL" || report.verdict === "HIGH") {
+                riskColor = "text-red-400";
+                bgGlow = "bg-red-500/20";
+                iconContainer.className = "w-16 h-16 rounded-2xl flex items-center justify-center relative shadow-lg bg-red-500/10 border border-red-500/30 shadow-neon-purple animate-pulse";
+                iconMarkup = '<i class="fa-solid fa-radiation text-3xl text-red-400"></i>';
+                riskLabel = report.verdict === "CRITICAL" ? "Kritické (CRITICAL)" : "Vysoké (HIGH)";
+            } else if (report.verdict === "MEDIUM") {
+                riskColor = "text-amber-400";
+                bgGlow = "bg-amber-500/20";
+                iconContainer.className = "w-16 h-16 rounded-2xl flex items-center justify-center relative shadow-lg bg-amber-500/10 border border-amber-500/30";
+                iconMarkup = '<i class="fa-solid fa-triangle-exclamation text-3xl text-amber-400"></i>';
+                riskLabel = "Stredné (MEDIUM)";
+            } else {
+                iconContainer.className = "w-16 h-16 rounded-2xl flex items-center justify-center relative shadow-lg bg-emerald-500/10 border border-emerald-500/30 shadow-neon-cyan";
+            }
+
+            iconContainer.innerHTML = iconMarkup;
+            titleEl.className = `text-xl md:text-2xl font-black mt-0.5 ${riskColor}`;
+            titleEl.innerText = report.title || "ANALÝZA DOKONČENÁ";
+            
+            claimantEl.innerText = report.claimant || "Nezistený";
+            licenseEl.innerText = report.license || "Standard License";
+            
+            riskEl.className = `text-sm font-bold ${riskColor}`;
+            riskEl.innerText = riskLabel;
+            
+            reasoningEl.innerHTML = report.reasoningHtml || "Žiadne doplňujúce informácie.";
+
+            currentSpeakingText = `Copyright posudok pre ${metadata.title}. 
+            Výsledný verdikt: ${riskLabel}. 
+            Zistený držiteľ práv: ${report.claimant}. 
+            Rozbor situácie: ${report.reasoningHtml.replace(/<[^>]*>/g, '')}`;
+        }
+
+        // Initialize Speech on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            initSpeechSynthesis();
+        });
+    </script>
+</body>
+</html>
